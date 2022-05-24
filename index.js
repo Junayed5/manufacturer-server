@@ -53,6 +53,11 @@ async function ran() {
             const result = await reviewCollection.insertOne(review);
             res.send(result);
         })
+
+        app.get('/review', async(req,res) => {
+            const allReviews = await reviewCollection.find().toArray();
+            res.send(allReviews);
+        })
     }
     finally { }
 }
