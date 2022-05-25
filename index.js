@@ -48,6 +48,10 @@ async function ran() {
             const orders = await purchaseOrderCollection.find(query).toArray();
             res.send(orders);
         })
+        app.get('/order', async (req, res) => {
+            const orders = await purchaseOrderCollection.find().toArray();
+            res.send(orders);
+        })
 
         app.post('/review', async (req, res) => {
             const review = req.body;
