@@ -71,6 +71,13 @@ async function ran() {
             const result = await profileCollection.updateOne(filter,updateDoc,options);
             res.send(result);
         })
+
+        app.get('/profile/:email', async(req,res) => {
+            const email = req.params.email;
+            const filter = {email : email}
+            const profile = await profileCollection.findOne(filter);
+            res.send(profile)
+        })
     }
     finally { }
 }
