@@ -22,6 +22,7 @@ async function ran() {
         const purchaseOrderCollection = client.db('computer_parts').collection('orders');
         const reviewCollection = client.db('computer_parts').collection('review');
         const profileCollection = client.db('computer_parts').collection('profile');
+        const userCollection = client.db('computer_parts').collection('user');
 
         app.get('/parts', async (req, res) => {
             const parts = await partsCollection.find().toArray();
@@ -35,7 +36,7 @@ async function ran() {
             res.send(result);
         })
 
-        app.post('/parts', async (req, res) => {
+        app.post  ('/parts', async (req, res) => {
             const newParts = req.body;
             const result = await partsCollection.insertOne(newParts);
             res.send(result);
@@ -87,6 +88,24 @@ async function ran() {
             const filter = {email : email}
             const profile = await profileCollection.findOne(filter);
             res.send(profile)
+        })
+
+        app.get('/users' , async (req, res) => {
+            const users = await userCollection.find().toArray();
+            res.send(users);
+          });
+
+        app.put('/user/:email', async(req,res) => {
+            const email = req.params.email;
+            const user = req.body;
+            const filter = {email:email};
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: user,
+            };
+            const result = await userCollection.updateOne(filter, updateDoc, options);
+            const token = jwt.sign({email : email},process.env.SECRET_KEY,{expiresIn:'1d'});
+            res.send({result,token})
         })
     }
     finally { }
