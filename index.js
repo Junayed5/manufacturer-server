@@ -35,6 +35,12 @@ async function ran() {
             res.send(result);
         })
 
+        app.post('/parts', async (req, res) => {
+            const newParts = req.body;
+            const result = await partsCollection.insertOne(newParts);
+            res.send(result);
+        })
+
 
         app.post('/orders', async (req, res) => {
             const orders = req.body;
