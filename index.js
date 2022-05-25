@@ -21,6 +21,7 @@ async function ran() {
         const partsCollection = client.db('computer_parts').collection('parts');
         const purchaseOrderCollection = client.db('computer_parts').collection('orders');
         const reviewCollection = client.db('computer_parts').collection('review');
+        const profileCollection = client.db('computer_parts').collection('profile');
 
         app.get('/parts', async (req, res) => {
             const parts = await partsCollection.find().toArray();
@@ -41,22 +42,34 @@ async function ran() {
             res.send(result);
         })
 
-        app.get('/orders', async(req,res) => {
+        app.get('/orders', async (req, res) => {
             const email = req.query.email;
-            const query = {email: email}
-            const orders = await purchaseOrderCollection.find(query).   toArray();
+            const query = { email: email }
+            const orders = await purchaseOrderCollection.find(query).toArray();
             res.send(orders);
-        } )
+        })
 
-        app.post('/review', async(req,res) => {
+        app.post('/review', async (req, res) => {
             const review = req.body;
             const result = await reviewCollection.insertOne(review);
             res.send(result);
         })
 
-        app.get('/review', async(req,res) => {
+        app.get('/review', async (req, res) => {
             const allReviews = await reviewCollection.find().toArray();
             res.send(allReviews);
+        });
+
+        app.put('/profile/:email', async (req, res) => {
+            const email = req.params.email;
+            const profile = req.body;
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: profile
+            };
+            const result = await profileCollection.updateOne(filter,updateDoc,options);
+            res.send(result);
         })
     }
     finally { }
