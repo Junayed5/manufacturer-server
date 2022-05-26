@@ -62,6 +62,13 @@ async function ran() {
             res.send(result);
         })
 
+        app.delete('/parts/:name',verifyJWT,verifyAdmin, async(req,res) => {
+            const name = req.params.name;
+            const filter = {name: name}
+            const result = await partsCollection.deleteOne(filter);
+            res.send(result);
+        })
+
         app.post('/parts', async (req, res) => {
             const newParts = req.body;
             const result = await partsCollection.insertOne(newParts);
