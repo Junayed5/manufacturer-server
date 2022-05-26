@@ -14,17 +14,15 @@ app.use(express.json());
 
 
 
-// async function ran() {
-//     try {
-//         await client.connect();
 
 
-        
-        
 
-        
 
-        
+
+
+
+
+
 
 //         app.post('/parts', async (req, res) => {
 //             const newParts = req.body;
@@ -157,7 +155,7 @@ app.use(express.json());
 //             })
 //         })
 
-        
+
 //     }
 //     finally { }
 // }
@@ -183,47 +181,57 @@ function verifyJWT(req, res, next) {
     });
 }
 client.connect(err => {
-  const collection = client.db("test").collection("devices");
-  // perform actions on the collection object
-  const partsCollection = client.db('computer_parts').collection('parts');
-  const purchaseOrderCollection = client.db('computer_parts').collection('orders');
-  const reviewCollection = client.db('computer_parts').collection('review');
-  const profileCollection = client.db('computer_parts').collection('profile');
-  const userCollection = client.db('computer_parts').collection('user');
+    const collection = client.db("test").collection("devices");
+    // perform actions on the collection object
+    const partsCollection = client.db('computer_parts').collection('parts');
+    const purchaseOrderCollection = client.db('computer_parts').collection('orders');
+    const reviewCollection = client.db('computer_parts').collection('review');
+    const profileCollection = client.db('computer_parts').collection('profile');
+    const userCollection = client.db('computer_parts').collection('user');
 
-  const verifyAdmin = async (req, res, next) => {
-    const requester = req.decoded.email;
-    const requesterAccount = await userCollection.findOne({ email: requester });
-    if (requesterAccount.role === 'admin') {
-        next();
+    const verifyAdmin = async (req, res, next) => {
+        const requester = req.decoded.email;
+        const requesterAccount = await userCollection.findOne({ email: requester });
+        if (requesterAccount.role === 'admin') {
+            next();
+        }
+        else {
+            res.status(403).send({ message: 'forbidden' });
+        }
     }
-    else {
-        res.status(403).send({ message: 'forbidden' });
+
+    async function ran() {
+        try {
+            await client.connect();
+            app.get('/home', async (req, res) => {
+                res.send('This is home')
+            })
+        
+            app.get("/parts", async (req, res) => {
+                const parts = await partsCollection.find().toArray();
+                res.send(parts);
+            })
+        
+            app.get('/part/:id', async (req, res) => {
+                const id = req.params.id;
+                const filter = { _id: ObjectId(id) };
+                const result = await partsCollection.findOne(filter);
+                res.send(result);
+            })
+        
+            app.delete('/parts/:name', verifyJWT, verifyAdmin, async (req, res) => {
+                const name = req.params.name;
+                const filter = { name: name }
+                const result = await partsCollection.deleteOne(filter);
+                res.send(result);
+            })
+        }
+        finally { }
+
     }
-}
 
-  app.get('/home', async(req,res) => {
-      res.send('This is home')
-  })
-
-  app.get("/parts", async (req, res) => {
-    const parts = await partsCollection.find().toArray();
-    res.send(parts);
-
-    app.get('/part/:id', async (req, res) => {
-        const id = req.params.id;
-        const filter = { _id: ObjectId(id) };
-        const result = await partsCollection.findOne(filter);
-        res.send(result);
-    })
-
-    app.delete('/parts/:name', verifyJWT, verifyAdmin, async (req, res) => {
-        const name = req.params.name;
-        const filter = { name: name }
-        const result = await partsCollection.deleteOne(filter);
-        res.send(result);
-    })
-})
+    ran().catch(console.dir)
+    
 });
 
 
