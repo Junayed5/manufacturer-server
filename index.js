@@ -3,7 +3,7 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const stripe = require("stripe")('sk_test_51L1CEICVUvLchhzL4Aq4T82EnfnUQz0Sk8nl5vgkwkScbWufrTFvMrNCjhoaIvnFzAwvoxSv9MR5XjBcWaHXF9ao00J1HpsodX');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -12,7 +12,7 @@ app.use(cors());
 app.use(express.json());
 
 
-const uri = "mongodb+srv://computer_parts:5uaXGlombmbGJ2Hu@cluster0.5losn.mongodb.net/?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.5losn.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
 function verifyJWT(req, res, next) {
@@ -21,7 +21,7 @@ function verifyJWT(req, res, next) {
         return res.status(401).send({ message: 'UnAuthorized access' });
     }
     const token = authHeader.split(' ')[1];
-    jwt.verify(token, '402726b741fe49651ec20a2ece5231b9a7fc1ec784cecec4eabf4689ff0eb21c29a1cff901d9d78824e79d41bd6b3515381de91659ec5dff84e0e62cee28125d', function (err, decoded) {
+    jwt.verify(token, process.env.SECRET_KEY, function (err, decoded) {
         if (err) {
             return res.status(403).send({ message: 'Forbidden access' })
         }
@@ -154,7 +154,7 @@ client.connect(err => {
                     $set: user,
                 };
                 const result = await userCollection.updateOne(filter, updateDoc, options);
-                const token = jwt.sign({ email: email }, '402726b741fe49651ec20a2ece5231b9a7fc1ec784cecec4eabf4689ff0eb21c29a1cff901d9d78824e79d41bd6b3515381de91659ec5dff84e0e62cee28125d', { expiresIn: '3d' });
+                const token = jwt.sign({ email: email }, process.env.SECRET_KEY, { expiresIn: '3d' });
                 res.send({ result, token })
             })
 
