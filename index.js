@@ -51,7 +51,7 @@ async function ran() {
             }
         }
 
-        app.get('/parts', async (req, res) => {
+        app.get("/parts", async (req, res) => {
             const parts = await partsCollection.find().toArray();
             res.send(parts);
         })
