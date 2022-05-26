@@ -22,19 +22,9 @@ app.use(express.json());
         
         
 
-//         app.get('/part/:id', async (req, res) => {
-//             const id = req.params.id;
-//             const filter = { _id: ObjectId(id) };
-//             const result = await partsCollection.findOne(filter);
-//             res.send(result);
-//         })
+        
 
-//         app.delete('/parts/:name', verifyJWT, verifyAdmin, async (req, res) => {
-//             const name = req.params.name;
-//             const filter = { name: name }
-//             const result = await partsCollection.deleteOne(filter);
-//             res.send(result);
-//         })
+        
 
 //         app.post('/parts', async (req, res) => {
 //             const newParts = req.body;
@@ -219,6 +209,20 @@ client.connect(err => {
   app.get("/parts", async (req, res) => {
     const parts = await partsCollection.find().toArray();
     res.send(parts);
+
+    app.get('/part/:id', async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: ObjectId(id) };
+        const result = await partsCollection.findOne(filter);
+        res.send(result);
+    })
+
+    app.delete('/parts/:name', verifyJWT, verifyAdmin, async (req, res) => {
+        const name = req.params.name;
+        const filter = { name: name }
+        const result = await partsCollection.deleteOne(filter);
+        res.send(result);
+    })
 })
 });
 
