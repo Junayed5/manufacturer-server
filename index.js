@@ -13,46 +13,8 @@ app.use(express.json());
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-//         app.post('/parts', async (req, res) => {
-//             const newParts = req.body;
-//             const result = await partsCollection.insertOne(newParts);
-//             res.send(result);
-//         })
-
-
-//         app.post('/orders', async (req, res) => {
-//             const orders = req.body;
-//             const result = await purchaseOrderCollection.insertOne(orders);
-//             res.send(result);
-//         })
-
-//         app.get('/orders', verifyJWT, async (req, res) => {
-//             const email = req.query.email;
-//             const decodedEmail = req.decoded.email;
-//             if (email === decodedEmail) {
-//                 const query = { email: email }
-//                 const orders = await purchaseOrderCollection.find(query).toArray();
-//                 return res.send(orders);
-//             }
-//             else {
-//                 return res.status(403).send({ message: 'forbidden access' });
-//             }
-//         })
-//         app.get('/order', async (req, res) => {
-//             const orders = await purchaseOrderCollection.find().toArray();
-//             res.send(orders);
-//         })
+        
+        
 
 //         app.post('/review', async (req, res) => {
 //             const review = req.body;
@@ -206,24 +168,53 @@ client.connect(err => {
             app.get('/home', async (req, res) => {
                 res.send('This is home')
             })
-        
+
             app.get("/parts", async (req, res) => {
                 const parts = await partsCollection.find().toArray();
                 res.send(parts);
             })
-        
+
             app.get('/part/:id', async (req, res) => {
                 const id = req.params.id;
                 const filter = { _id: ObjectId(id) };
                 const result = await partsCollection.findOne(filter);
                 res.send(result);
             })
-        
+
             app.delete('/parts/:name', verifyJWT, verifyAdmin, async (req, res) => {
                 const name = req.params.name;
                 const filter = { name: name }
                 const result = await partsCollection.deleteOne(filter);
                 res.send(result);
+            })
+
+            app.post('/parts', async (req, res) => {
+                const newParts = req.body;
+                const result = await partsCollection.insertOne(newParts);
+                res.send(result);
+            })
+            app.post('/orders', async (req, res) => {
+                const orders = req.body;
+                const result = await purchaseOrderCollection.insertOne(orders);
+                res.send(result);
+            })
+
+            app.get('/orders', verifyJWT, async (req, res) => {
+                const email = req.query.email;
+                const decodedEmail = req.decoded.email;
+                if (email === decodedEmail) {
+                    const query = { email: email }
+                    const orders = await purchaseOrderCollection.find(query).toArray();
+                    return res.send(orders);
+                }
+                else {
+                    return res.status(403).send({ message: 'forbidden access' });
+                }
+            })
+
+            app.get('/order', async (req, res) => {
+                const orders = await purchaseOrderCollection.find().toArray();
+                res.send(orders);
             })
         }
         finally { }
@@ -231,7 +222,7 @@ client.connect(err => {
     }
 
     ran().catch(console.dir)
-    
+
 });
 
 
