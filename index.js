@@ -13,48 +13,14 @@ app.use(express.json());
 
 
 
-// var uri = "mongodb://computer_parts:5uaXGlombmbGJ2Hu@cluster0-shard-00-00.5losn.mongodb.net:27017,cluster0-shard-00-01.5losn.mongodb.net:27017,cluster0-shard-00-02.5losn.mongodb.net:27017/?ssl=true&replicaSet=atlas-yybo5g-shard-0&authSource=admin&retryWrites=true&w=majority";
-// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
-// function verifyJWT(req, res, next) {
-//     const authHeader = req.headers.authorization;
-//     if (!authHeader) {
-//         return res.status(401).send({ message: 'UnAuthorized access' });
-//     }
-//     const token = authHeader.split(' ')[1];
-//     jwt.verify(token, '402726b741fe49651ec20a2ece5231b9a7fc1ec784cecec4eabf4689ff0eb21c29a1cff901d9d78824e79d41bd6b3515381de91659ec5dff84e0e62cee28125d', function (err, decoded) {
-//         if (err) {
-//             return res.status(403).send({ message: 'Forbidden access' })
-//         }
-//         req.decoded = decoded;
-//         next();
-//     });
-// }
 
 // async function ran() {
 //     try {
 //         await client.connect();
-//         const partsCollection = client.db('computer_parts').collection('parts');
-//         const purchaseOrderCollection = client.db('computer_parts').collection('orders');
-//         const reviewCollection = client.db('computer_parts').collection('review');
-//         const profileCollection = client.db('computer_parts').collection('profile');
-//         const userCollection = client.db('computer_parts').collection('user');
 
-//         const verifyAdmin = async (req, res, next) => {
-//             const requester = req.decoded.email;
-//             const requesterAccount = await userCollection.findOne({ email: requester });
-//             if (requesterAccount.role === 'admin') {
-//                 next();
-//             }
-//             else {
-//                 res.status(403).send({ message: 'forbidden' });
-//             }
-//         }
 
-//         app.get("/parts", async (req, res) => {
-//             const parts = await partsCollection.find().toArray();
-//             res.send(parts);
-//         })
+        
+        
 
 //         app.get('/part/:id', async (req, res) => {
 //             const id = req.params.id;
@@ -211,12 +177,49 @@ app.use(express.json());
 // const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://computer_parts:5uaXGlombmbGJ2Hu@cluster0.5losn.mongodb.net/?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+
+function verifyJWT(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'UnAuthorized access' });
+    }
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, '402726b741fe49651ec20a2ece5231b9a7fc1ec784cecec4eabf4689ff0eb21c29a1cff901d9d78824e79d41bd6b3515381de91659ec5dff84e0e62cee28125d', function (err, decoded) {
+        if (err) {
+            return res.status(403).send({ message: 'Forbidden access' })
+        }
+        req.decoded = decoded;
+        next();
+    });
+}
 client.connect(err => {
   const collection = client.db("test").collection("devices");
   // perform actions on the collection object
+  const partsCollection = client.db('computer_parts').collection('parts');
+  const purchaseOrderCollection = client.db('computer_parts').collection('orders');
+  const reviewCollection = client.db('computer_parts').collection('review');
+  const profileCollection = client.db('computer_parts').collection('profile');
+  const userCollection = client.db('computer_parts').collection('user');
+
+  const verifyAdmin = async (req, res, next) => {
+    const requester = req.decoded.email;
+    const requesterAccount = await userCollection.findOne({ email: requester });
+    if (requesterAccount.role === 'admin') {
+        next();
+    }
+    else {
+        res.status(403).send({ message: 'forbidden' });
+    }
+}
+
   app.get('/home', async(req,res) => {
       res.send('This is home')
   })
+
+  app.get("/parts", async (req, res) => {
+    const parts = await partsCollection.find().toArray();
+    res.send(parts);
+})
 });
 
 
