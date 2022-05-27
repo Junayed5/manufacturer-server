@@ -154,7 +154,7 @@ client.connect(err => {
                     $set: user,
                 };
                 const result = await userCollection.updateOne(filter, updateDoc, options);
-                const token = jwt.sign({ email: email }, process.env.SECRET_KEY, { expiresIn: '3d' });
+                const token = jwt.sign({ email: email }, process.env.SECRET_KEY, { expiresIn: '1d' });
                 res.send({ result, token })
             })
 
